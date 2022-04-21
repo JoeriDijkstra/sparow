@@ -1,13 +1,17 @@
 defmodule Sparow.IMAP.CurlWrapper do
-  # Refactor get_mail and get_full_mail in one function (case with mail_uid var) -> Split both main functions in one?
-  def get_mail(state, args) do
-    %{email: email, inbox: inbox, password: password, mail_uid: mail_uid} = state
+  def get_mail(state, args, latest \\ false) do
+    %{email: email, inbox: inbox, password: password} = state
+
+    query_uid = case latest do
+      true -> "*:*"
+      false -> state[:mail_uid]
+    end
 
     # Send CURL
     args = [
      "imaps://outlook.office365.com:993/#{inbox}",
      "-X",
-     "UID FETCH #{mail_uid} (#{args})",
+     "UID FETCH #{query_uid} (#{args})",
      "-u",
      "#{email}:#{password}"
    ]
@@ -15,9 +19,13 @@ defmodule Sparow.IMAP.CurlWrapper do
    # Execute and return
    {resp, 0} = System.cmd("curl", args, [])
 
-   IO.puts("\nCurl complete -> #{mail_uid} at" <> to_string(NaiveDateTime.utc_now()))
+   IO.puts("\nCurl complete -> #{query_uid} at" <> to_string(NaiveDateTime.utc_now()))
 
    resp
+  end
+
+  def get_latest_mail(state) do
+    get_mail(state, "FLAGS UID", true)
   end
 
   def get_full_mail(state) do
@@ -36,26 +44,6 @@ defmodule Sparow.IMAP.CurlWrapper do
    IO.puts("\nCurl complete -> #{mail_uid} at" <> to_string(NaiveDateTime.utc_now()))
 
    resp
-  end
-
-  def get_latest_mail(state) do
-    %{email: email, inbox: inbox, password: password} = state
-
-     # Send CURL
-     args = [
-      "imaps://outlook.office365.com:993/#{inbox}",
-      "-X",
-      "UID FETCH *:* (FLAGS UID)",
-      "-u",
-      "#{email}:#{password}"
-    ]
-
-    # Execute and return
-    {resp, 0} = System.cmd("curl", args, [])
-
-    IO.puts("\nCurl complete -> Data fetched")
-
-    resp
   end
 
   def set_flag(flag, state, method) do
