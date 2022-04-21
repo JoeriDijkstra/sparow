@@ -1,4 +1,5 @@
 defmodule Sparow.IMAP.CurlWrapper do
+  # Refactor get_mail and get_full_mail in one function (case with mail_uid var) -> Split both main functions in one?
   def get_mail(state, args) do
     %{email: email, inbox: inbox, password: password, mail_uid: mail_uid} = state
 
@@ -14,7 +15,7 @@ defmodule Sparow.IMAP.CurlWrapper do
    # Execute and return
    {resp, 0} = System.cmd("curl", args, [])
 
-   IO.puts("\nCurl complete -> #{mail_uid}")
+   IO.puts("\nCurl complete -> #{mail_uid} at" <> to_string(NaiveDateTime.utc_now()))
 
    resp
   end
@@ -32,7 +33,7 @@ defmodule Sparow.IMAP.CurlWrapper do
    # Execute and return
    {resp, 0} = System.cmd("curl", args, [])
 
-   IO.puts("\nCurl complete -> #{mail_uid}")
+   IO.puts("\nCurl complete -> #{mail_uid} at" <> to_string(NaiveDateTime.utc_now()))
 
    resp
   end
@@ -44,7 +45,7 @@ defmodule Sparow.IMAP.CurlWrapper do
      args = [
       "imaps://outlook.office365.com:993/#{inbox}",
       "-X",
-      "UID FETCH *:* (ENVELOPE FLAGS UID)",
+      "UID FETCH *:* (FLAGS UID)",
       "-u",
       "#{email}:#{password}"
     ]

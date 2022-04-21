@@ -4,10 +4,11 @@ defmodule Sparow.Distributor do
   def start_servers(credentials, timer) do
     Worker.start_imap_worker(credentials)
     Worker.start_logging_worker
+    Worker.start_betty_worker
     Worker.start_cron_worker(timer)
   end
 
   def stop_servers() do
-    Worker.stop_servers()
+    Worker.stop_servers
   end
 end

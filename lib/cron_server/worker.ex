@@ -10,7 +10,7 @@ defmodule Sparow.CronServer.Worker do
 
   defp ok_mail_pipeline(mail_content) do
     IO.puts("\nStarting new mail pipeline...")
-    mail_content
+    GenServer.cast(:betty_server, {:write, mail_content})
   end
 
   defp error_mail_pipeline(message) do
