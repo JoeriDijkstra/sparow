@@ -26,3 +26,6 @@ shoppinglist-*.tar
 /tmp/
 
 /logs/
+
+# Hidden sparow config file
+/lib/sparow_hidden.ex
